@@ -1,0 +1,134 @@
+/*---- Initials / Dependencies ---*/
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.11'
+    id 'org.beryx.runtime' version '1.12.4'
+    id 'idea'
+    //id 'maven-publish'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Implementation
+    //implementation ''
+
+    // Testing
+    testImplementation(platform('org.junit:junit-bom:5.7.0'))
+    testImplementation('org.junit.jupiter:junit-jupiter:5.8.2')
+
+    // JavaFX UI Testing
+    //testImplementation("org.testfx:testfx-core:4.0.16-alpha")
+    //testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
+    //testImplementation('org.assertj:assertj-core:3.22.0')
+
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+/*---- Project variables ---*/
+def projectJvmArgs = [
+        "--add-exports=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED",
+        "-Xmx256m"
+        // Enable for illegal reflection to these classes.
+        //"--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        //"--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED"
+]
+def projectMainClass = "application.Launcher", // "application.Launcher"
+    projectAppVersion = "1.0.0", // "1.0.0"
+    projectAppName = "App-Client-Plus", // "App-Client-Plus"
+    projectAppDescription = "A Description for this application example.", // "A Description for this application example."
+    projectIcon = "ile-name", //  "file-name" Provide a img file... Windows: [this].ico | Mac: [this].icns | Linux: [this].png
+    projectJavaVersion = 17, // 17
+    projectDebMaintainer = "maintainer@email.com", // "maintainer@email.com"
+    projectVendor = "ProgrammerName", // "ProgrammerName"
+    projectLicense = "Apache 2.0" // "Apache 2.0"
+
+/*---- Tasks ----*/
+tasks.register('uberJar', Jar) {
+    archiveClassifier = 'uber'
+    from sourceSets.main.output
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+}
+
+rootProject.tasks.named("uberJar") {
+    duplicatesStrategy = 'include'
+}
+
+/*---- Building & Plugin settings ----*/
+application {
+    mainClass.set(projectMainClass)
+    applicationName = projectAppName
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(projectJavaVersion))
+    }
+}
+
+javafx {
+    modules = ['javafx.controls', 'javafx.fxml']
+    version = "$projectJavaVersion"
+}
+
+run { jvmArgs = projectJvmArgs }
+
+compileJava {
+    options.compilerArgs << '-Xlint:unchecked'
+}
+
+runtime {
+
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher {
+        noConsole = true
+        jvmArgs = [
+                "--add-exports=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED",
+                //"--illegal-access=permit"
+        ]
+        jpackage {
+            def currentOs = org.gradle.internal.os.OperatingSystem.current()
+
+            def imgType = currentOs.windows ? 'ico' : currentOs.macOsX ? 'icns' : 'png'
+            imageOptions += ['--icon', "src/main/resources/$projectIcon.$imgType"]
+            installerOptions += ['--vendor', projectVendor]
+            installerOptions += ['--resource-dir', "build/jpackage/$projectAppName/lib"]
+
+            imageName = projectAppName // Should be the same
+            installerName = projectAppName
+            appVersion = projectAppVersion
+
+            if(currentOs.windows) {
+                installerOptions += ['--win-per-user-install', '--win-dir-chooser', '--win-menu', '--win-shortcut']
+                installerType = 'msi'
+            }
+            else if (currentOs.linux) {
+                installerOptions += [
+                        '--linux-menu-group', 'Utility',
+                        '--description', projectAppDescription,
+                        '--app-version', projectAppVersion,
+                        '--linux-shortcut',
+                        '--linux-deb-maintainer', projectDebMaintainer,
+                        '--linux-rpm-license-type', projectLicense,
+                ]
+                installerType = 'deb'
+            }
+            else if (currentOs.macOsX) {
+                installerOptions += ['--mac-package-name', projectAppName]
+                installerType = 'dmg'
+            }
+        }
+    }
+}
+
