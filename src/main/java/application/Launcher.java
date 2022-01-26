@@ -11,7 +11,7 @@ class Launcher {
     public static class MainStart extends Application {
         @Override
         public void start(Stage stg) {
-            System.out.println("Template Working");
+            System.out.println("ShutdownPlus");
             System.exit(0);
         }
     }

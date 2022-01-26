@@ -43,12 +43,12 @@ def projectJvmArgs = [
 ]
 def projectMainClass = "application.Launcher", // "application.Launcher"
     projectAppVersion = "1.0.0", // "1.0.0"
-    projectAppName = "App-Client-Plus", // "App-Client-Plus"
-    projectAppDescription = "A Description for this application example.", // "A Description for this application example."
-    projectIcon = "ile-name", //  "file-name" Provide a img file... Windows: [this].ico | Mac: [this].icns | Linux: [this].png
+    projectAppName = "ShutdownPlus", // "App-Client-Plus"
+    projectAppDescription = "A application & API for shutdown systems in a multitude of ways.", // "A Description for this application example."
+    projectIcon = "icon", //  "file-name" Provide a img file... Windows: [this].ico | Mac: [this].icns | Linux: [this].png
     projectJavaVersion = 17, // 17
-    projectDebMaintainer = "maintainer@email.com", // "maintainer@email.com"
-    projectVendor = "ProgrammerName", // "ProgrammerName"
+    projectDebMaintainer = "nex.rx.official@gmail.com", // "maintainer@email.com"
+    projectVendor = "Nex-Coder", // "ProgrammerName"
     projectLicense = "Apache 2.0" // "Apache 2.0"
 
 /*---- Tasks ----*/
@@ -131,4 +131,3 @@ runtime {
         }
     }
 }
-
