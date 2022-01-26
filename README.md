@@ -39,4 +39,4 @@ Placeholder
     - [ ] Restart
     - [ ] Sleep
   - [ ] Self-Updater
-  - [ ] Configurations Saving
+  - [ ] Configurations (Saving)
